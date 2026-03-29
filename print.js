@@ -1,112 +1,159 @@
+// ====== ELEMENTS ======
 var inputParagraph = document.getElementById("inputParagraph");
 var controlButton = document.getElementById("controlButton");
 var pauseButton = document.getElementById("pauseButton");
 var outputDiv = document.getElementById("output");
+
 var intervalInput = document.getElementById("intervalInput");
 var setIntervalButton = document.getElementById("setIntervalButton");
-var displayingTextInput = document.getElementById("DisplayingTextInput");
-var setDisplayingTextNumberButton = document.getElementById("setDisplayingofTextNumberButton");
 
+var wordsInput = document.getElementById("DisplayingTextInput");
+var setWordsButton = document.getElementById("setDisplayingofTextNumberButton");
 
-var wordsToShow = 3; // Số từ mặc định hiển thị mỗi lần
-
-setDisplayingTextNumberButton.addEventListener("click", function () {
-    var newWordsToShow = parseInt(displayingTextInput.value);
-    if (!isNaN(newWordsToShow) && newWordsToShow > 0) {
-        wordsToShow = newWordsToShow;
-    } else {
-        alert("Please enter a valid positive number!");
-    }
-});
-
-var interval;
+// ====== STATE ======
 var words = [];
 var index = 0;
+var timer = null;
+
+var intervalTime = 200;
+var wordsToShow = 3;
+
 var isPlaying = false;
-var currentIntervalTime = 200; // Default interval time in ms
+var hasStarted = false;
 
-setIntervalButton.addEventListener("click", function() {
-    var newIntervalTime = parseInt(intervalInput.value);
-    if (!isNaN(newIntervalTime) && newIntervalTime > 0) {
-        currentIntervalTime = newIntervalTime;
+// ====== EVENTS ======
+
+// set số từ
+setWordsButton.onclick = function () {
+    var val = parseInt(wordsInput.value);
+    if (val > 0) {
+        wordsToShow = val;
+    }
+};
+
+// set interval
+setIntervalButton.onclick = function () {
+    var val = parseInt(intervalInput.value);
+    if (val > 0) {
+        intervalTime = val;
+
+        if (isPlaying) {
+            restartTimer();
+        }
+    }
+};
+
+// ENTER để set nhanh
+wordsInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+        setWordsButton.click();
     }
 });
 
-controlButton.addEventListener("click", function() {
-    if (!isPlaying) {
-        startDisplay();
+intervalInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+        setIntervalButton.click();
+    }
+});
+
+// play / reset
+controlButton.onclick = function () {
+    if (hasStarted) {
+        reset();
     } else {
-        resetDisplay();
+        start();
     }
-});
+};
 
-pauseButton.addEventListener("click", function() {
+// pause / continue
+pauseButton.onclick = function () {
     if (isPlaying) {
-        pauseDisplay();
+        pause();
     } else {
-        continueDisplay();
+        resume();
     }
-});
+};
 
-function startDisplay() {
-    if (interval) {
-        clearInterval(interval);
-    }
+// ====== CORE ======
 
-    var paragraph = inputParagraph.value.trim();
-    words = paragraph.split(/\s+/);
+function start() {
+    var text = inputParagraph.value.trim();
+    if (text === "") return;
+
+    words = text.split(/\s+/);
     index = 0;
 
-    if (words.length === 0) {
-        return;
-    }
-
     isPlaying = true;
+    hasStarted = true;
+
     controlButton.textContent = "Reset";
     pauseButton.disabled = false;
 
-    interval = setInterval(displayNextWord, currentIntervalTime);
+    startTimer();
 }
 
-function resetDisplay() {
-    clearInterval(interval);
+function reset() {
+    stopTimer();
+
     isPlaying = false;
-    controlButton.textContent = "Play";
-    pauseButton.textContent = "Pause"; // Reset the pause button text
-    pauseButton.disabled = true;
+    hasStarted = false;
+    index = 0;
+    words = [];
+
     outputDiv.textContent = "";
+
+    controlButton.textContent = "Play";
+    pauseButton.textContent = "Pause";
+    pauseButton.disabled = true;
 }
 
-function pauseDisplay() {
-    clearInterval(interval);
+function pause() {
+    stopTimer();
     isPlaying = false;
     pauseButton.textContent = "Continue";
 }
 
-function continueDisplay() {
-    if (!isPlaying) {
-        isPlaying = true;
-        pauseButton.textContent = "Pause";
-        interval = setInterval(displayNextWord, currentIntervalTime);
+function resume() {
+    isPlaying = true;
+    pauseButton.textContent = "Pause";
+    startTimer();
+}
+
+// ====== TIMER ======
+
+function startTimer() {
+    if (timer !== null) return;
+
+    timer = setInterval(nextWord, intervalTime);
+}
+
+function stopTimer() {
+    if (timer !== null) {
+        clearInterval(timer);
+        timer = null;
     }
 }
 
-function displayNextWord() {
-    if (index < words.length) {
-        // Lấy 3 từ tiếp theo
-        var nextWords = words.slice(index, index + wordsToShow).join(" ");
-        outputDiv.textContent = nextWords;
-
-        // Tăng chỉ số thêm 3
-        // index += 3;
-
-        // Chỉ tăng chỉ số thêm 1
-        index++;
-    } else {
-        clearInterval(interval);
-        isPlaying = false;
-        controlButton.textContent = "Play";
-        pauseButton.disabled = true;
-    }
+function restartTimer() {
+    stopTimer();
+    startTimer();
 }
 
+// ====== DISPLAY ======
+
+function nextWord() {
+    if (!isPlaying) return;
+
+    if (index >= words.length) {
+        reset();
+        return;
+    }
+
+    var start = index;
+    var end = start + wordsToShow;
+
+    var text = words.slice(start, end).join(" ");
+    outputDiv.textContent = text;
+
+    index++;
+}

@@ -1,58 +1,84 @@
-#output {
-    font-size: 60px;
-    color: #F0EDCC;
-    text-align: center;
-        /* display: flex;
-        align-items: center;
-        justify-content: center; */
-}
-
-.upper {
-    border: 3px solid #F0EDCC;
-    height: 240px;
-    width: 1550px;
-    margin: 20px 0px 10px 50px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    /* padding: 20px; */
-    
-}
-
-
-textarea {
-    padding: 5px 10px;
-    margin: 10px 0px 20px 30px;
-    color: #F0EDCC;
-    background-color: #02343F;
-    font-size: 20px;
-    width: 1600px; /* Chiều rộng */
-    height: 300px; /* Chiều cao */
+/* reset nhẹ */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 body {
     background-color: #02343F;
     color: #F0EDCC;
-    width: 1280px;
-    height: 720px;
-    /* border: 1px solid #F0EDCC; */
-    padding: 15px;
-        
+    font-family: Arial, sans-serif;
 }
 
-.credit {
+/* container co giãn */
+.container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+}
+
+/* title */
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* vùng hiển thị chữ */
+.upper {
+    border: 3px solid #F0EDCC;
+    min-height: 150px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 30px;
+    margin-bottom: 20px;
+    padding: 10px;
 }
 
-button {
-    font-size: 20px;
-    padding: 5px 10px;
+/* text output */
+#output {
+    font-size: clamp(24px, 5vw, 60px); /* 🔥 tự scale theo màn */
+    text-align: center;
 }
 
-input {
-    font-size: 20px;
-    padding: 5px 10px;
+/* textarea */
+textarea {
+    width: 100%;
+    min-height: 150px;
+    padding: 10px;
+    margin-bottom: 15px;
+    font-size: 16px;
+    color: #F0EDCC;
+    background-color: #02343F;
+    border: 1px solid #F0EDCC;
+}
+
+/* controls */
+.controls {
+    display: flex;
+    flex-wrap: wrap; /* 🔥 xuống dòng khi chật */
+    gap: 10px;
+}
+
+/* button + input */
+button, input {
+    padding: 8px 12px;
+    font-size: 16px;
+}
+
+/* credit */
+.credit {
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* 📱 mobile */
+@media (max-width: 600px) {
+    #output {
+        font-size: 24px;
+    }
+
+    .controls {
+        flex-direction: column;
+    }
 }
